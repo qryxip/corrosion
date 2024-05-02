@@ -452,7 +452,7 @@ function(_corrosion_add_library_target)
         elseif(Rust_CARGO_TARGET_ENV STREQUAL "gnu")
             set(is_windows_gnu TRUE)
         endif()
-    elseif(Rust_CARGO_TARGET_OS STREQUAL "darwin")
+    elseif(Rust_CARGO_TARGET_OS STREQUAL "darwin" OR Rust_CARGO_TARGET_OS STREQUAL "ios")
         set(is_macos TRUE)
     endif()
 
@@ -884,6 +884,35 @@ function(_add_cargo_build out_cargo_build_out_dir)
     endif()
 
     message(DEBUG "TARGET ${target_name} produces byproducts ${byproducts}")
+
+    include(CMakePrintHelpers)
+    cmake_print_variables(
+      CMAKE_SYSTEM_NAME
+      CMAKE_SYSTEM_VERSION
+      CMAKE_HOST_SYSTEM_NAME
+      CMAKE_HOST_SYSTEM_VERSION
+      CMAKE_CROSSCOMPILING
+      IOS
+      CMAKE_C_COMPILER
+      CMAKE_CXX_COMPILER
+      hostbuild_override
+      cargo_library_path
+      cargo_rustc_filter
+      cargo_target_option
+      cargo_profile
+      flags_genex
+      local_rustflags_delimiter
+      local_rustflags_genex
+      cargo_target_linker
+    )
+
+    if(IOS)
+      set(cargo_target_linker "")
+    endif()
+
+    cmake_print_variables(
+      cargo_target_linker
+    )
 
     add_custom_target(
         _cargo-build_${target_name}
